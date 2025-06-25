@@ -345,7 +345,9 @@ __device__ void Fluid::apply_external_forces_at(Source source,
     this->d_vel_y[indx(i, j)] += source.velocity * y_speed_modifier;
   }
 
-  this->d_vel_y[indx(i, j)] += this->g * d_t;
+  if (!this->d_is_solid[indx(i, j - 1)]) {
+    this->d_vel_y[indx(i, j)] += this->g * d_t;
+  }
 }
 
 void Fluid::apply_external_forces(Source source, float d_t) {
@@ -720,13 +722,11 @@ __device__ float Fluid::interpolate_smoke(float x, float y) const {
 __device__ void Fluid::apply_extrapolation_at(int i, int j) {
   if (j == 0) {
     this->d_vel_x[indx(i, j)] = this->d_vel_x[indx(i, j + 1)];
-    this->d_vel_y[indx(i, j + 1)] = 0;
   } else if (j == this->height - 1) {
     this->d_vel_x[indx(i, j)] = this->d_vel_x[indx(i, j - 1)];
   }
   if (i == 0) {
     this->d_vel_y[indx(i, j)] = this->d_vel_y[indx(i + 1, j)];
-    this->d_vel_x[indx(i + 1, j)] = 0;
   } else if (i == this->width - 1) {
     this->d_vel_y[indx(i, j)] = this->d_vel_y[indx(i - 1, j)];
   }

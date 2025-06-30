@@ -1,5 +1,4 @@
 # OpenSayal
-google-site-verification: googleaeca7ac20f5421ed.html
 
 ## Table of Content
 

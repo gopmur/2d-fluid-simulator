@@ -644,21 +644,23 @@ void Fluid::apply_velocity_advection(float d_t) {
 }
 
 __device__ float Fluid::interpolate_smoke(float x, float y) const {
-  float normalized_x = x / this->cell_size;
-  float normalized_y = y / this->cell_size;
+  x /= this->cell_size;
+  y /= this->cell_size;
 
-  int i = roundf(normalized_x) - 1;
-  int j = roundf(normalized_y) - 1;
+  int i_1 = roundf(x);
+  int j_1 = roundf(y);
+  int i_0 = i_1 - 1;
+  int j_0 = j_1 - 1;
 
-  float smoke_00 = this->is_valid_fluid(i, j) ? this->d_smoke[indx(i, j)] : 0;
-  float smoke_10 = this->is_valid_fluid(i + 1, j) ? this->d_smoke[indx(i + 1, j)] : 0;
-  float smoke_01 = this->is_valid_fluid(i, j + 1) ? this->d_smoke[indx(i, j + 1)] : 0;
-  float smoke_11 = this->is_valid_fluid(i + 1, j + 1) ? this->d_smoke[indx(i + 1, j + 1)] : 0;
+  float smoke_00 = is_valid_fluid(i_0, j_0) ? this->d_smoke[indx(i_0, j_0)] : 0;
+  float smoke_10 = is_valid_fluid(i_1, j_0) ? this->d_smoke[indx(i_1, j_0)] : 0;
+  float smoke_01 = is_valid_fluid(i_0, j_1) ? this->d_smoke[indx(i_0, j_1)] : 0;
+  float smoke_11 = is_valid_fluid(i_1, j_1) ? this->d_smoke[indx(i_1, j_1)] : 0;
 
-  float wx_0 = i + 1.5 - normalized_x;
-  float wy_0 = j + 1.5 - normalized_y;
-  float wx_1 = normalized_x - 0.5 - i;
-  float wy_1 = normalized_y - 0.5 - j;
+  float wx_0 = i_1 + 0.5 - x;
+  float wy_0 = j_1 + 0.5 - y;
+  float wx_1 = x - (i_0 + 0.5);
+  float wy_1 = y - (j_0 + 0.5);
 
   float w_00 = wx_0 * wy_0;
   float w_01 = wx_0 * wy_1;

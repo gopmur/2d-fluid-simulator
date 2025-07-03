@@ -646,21 +646,19 @@ void Fluid::apply_velocity_advection(float d_t) {
 __device__ float Fluid::interpolate_smoke(float x, float y) const {
   float normalized_x = x / this->cell_size;
   float normalized_y = y / this->cell_size;
-  float shifted_x = normalized_x - 0.5;
-  float shifted_y = normalized_y - 0.5;
 
-  int i = shifted_x;
-  int j = shifted_y;
+  int i = roundf(normalized_x) - 1;
+  int j = roundf(normalized_y) - 1;
 
   float smoke_00 = this->d_smoke[indx(i, j)];
   float smoke_10 = this->d_smoke[indx(i + 1, j)];
   float smoke_01 = this->d_smoke[indx(i, j + 1)];
   float smoke_11 = this->d_smoke[indx(i + 1, j + 1)];
 
-  float wx_0 = (i + 1) - shifted_x;
-  float wy_0 = (j + 1) - shifted_y;
-  float wx_1 = shifted_x - i;
-  float wy_1 = shifted_y - j;
+  float wx_0 = i + 1.5 - normalized_x;
+  float wy_0 = j + 1.5 - normalized_y;
+  float wx_1 = normalized_x - 0.5 - i;
+  float wy_1 = normalized_y - 0.5 - j;
 
   float w_00 = wx_0 * wy_0;
   float w_01 = wx_0 * wy_1;

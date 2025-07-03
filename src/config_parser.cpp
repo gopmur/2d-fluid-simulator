@@ -115,7 +115,7 @@ Config ConfigParser::parse() const {
               .drag_coeff =
                   ConfigParser::get_or(config_json, "fluid.drag_coeff", 0.0f),
               .viscosity =
-                  ConfigParser::get_or(config_json, "fluid.viscosity", 0.001f),
+                  ConfigParser::get_or(config_json, "fluid.viscosity", 0.0f),
           },
       .visual =
           {

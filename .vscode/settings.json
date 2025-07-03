@@ -18,6 +18,7 @@
     "nvcc",
     "OPENMP",
     "ptxas",
+    "RGBA",
     "Sayal",
     "strcmp",
     "syncthreads",

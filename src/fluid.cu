@@ -650,10 +650,10 @@ __device__ float Fluid::interpolate_smoke(float x, float y) const {
   int i = roundf(normalized_x) - 1;
   int j = roundf(normalized_y) - 1;
 
-  float smoke_00 = this->d_smoke[indx(i, j)];
-  float smoke_10 = this->d_smoke[indx(i + 1, j)];
-  float smoke_01 = this->d_smoke[indx(i, j + 1)];
-  float smoke_11 = this->d_smoke[indx(i + 1, j + 1)];
+  float smoke_00 = this->is_valid_fluid(i, j) ? this->d_smoke[indx(i, j)] : 0;
+  float smoke_10 = this->is_valid_fluid(i + 1, j) ? this->d_smoke[indx(i + 1, j)] : 0;
+  float smoke_01 = this->is_valid_fluid(i, j + 1) ? this->d_smoke[indx(i, j + 1)] : 0;
+  float smoke_11 = this->is_valid_fluid(i + 1, j + 1) ? this->d_smoke[indx(i + 1, j + 1)] : 0;
 
   float wx_0 = i + 1.5 - normalized_x;
   float wy_0 = j + 1.5 - normalized_y;

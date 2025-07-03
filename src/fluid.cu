@@ -644,77 +644,30 @@ void Fluid::apply_velocity_advection(float d_t) {
 }
 
 __device__ float Fluid::interpolate_smoke(float x, float y) const {
-  int i = x / this->cell_size;
-  int j = y / this->cell_size;
+  float normalized_x = x / this->cell_size;
+  float normalized_y = y / this->cell_size;
+  float shifted_x = normalized_x - 0.5;
+  float shifted_y = normalized_y - 0.5;
 
-  float in_x = x - i * this->cell_size;
-  float in_y = y - j * this->cell_size;
+  int i = shifted_x;
+  int j = shifted_y;
 
-  Vector2d<int> indices_1(i, j);
-  Vector2d<int> indices_2;
-  Vector2d<int> indices_3;
-  Vector2d<int> indices_4;
+  float smoke_00 = this->d_smoke[indx(i, j)];
+  float smoke_10 = this->d_smoke[indx(i + 1, j)];
+  float smoke_01 = this->d_smoke[indx(i, j + 1)];
+  float smoke_11 = this->d_smoke[indx(i + 1, j + 1)];
 
-  float avg_smoke = 0;
+  float wx_0 = (i + 1) - shifted_x;
+  float wy_0 = (j + 1) - shifted_y;
+  float wx_1 = shifted_x - i;
+  float wy_1 = shifted_y - j;
 
-  if (in_x < this->cell_size / 2.0 && in_y < this->cell_size / 2.0) {
-    indices_2 = Vector2d<int>(i - 1, j);
-    indices_3 = Vector2d<int>(i, j - 1);
-    indices_4 = Vector2d<int>(i - 1, j - 1);
-  } else if (in_x < this->cell_size / 2.0) {
-    indices_2 = Vector2d<int>(i - 1, j);
-    indices_3 = Vector2d<int>(i, j + 1);
-    indices_4 = Vector2d<int>(i - 1, j + 1);
-  } else if (in_y < this->cell_size / 2.0) {
-    indices_2 = Vector2d<int>(i + 1, j);
-    indices_3 = Vector2d<int>(i, j - 1);
-    indices_4 = Vector2d<int>(i + 1, j - 1);
-  } else {
-    indices_2 = Vector2d<int>(i + 1, j);
-    indices_3 = Vector2d<int>(i, j + 1);
-    indices_4 = Vector2d<int>(i + 1, j + 1);
-  }
+  float w_00 = wx_0 * wy_0;
+  float w_01 = wx_0 * wy_1;
+  float w_10 = wx_1 * wy_0;
+  float w_11 = wx_1 * wy_1;
 
-  Vector2d<float> pos_1 =
-      get_center_position(indices_1.get_x(), indices_1.get_y());
-  Vector2d<float> pos_2 =
-      get_center_position(indices_2.get_x(), indices_2.get_y());
-  Vector2d<float> pos_3 =
-      get_center_position(indices_3.get_x(), indices_3.get_y());
-  Vector2d<float> pos_4 =
-      get_center_position(indices_4.get_x(), indices_4.get_y());
-
-  auto distance_1 = get_distance(Vector2d<float>(x, y), pos_1);
-  auto distance_2 = get_distance(Vector2d<float>(x, y), pos_2);
-  auto distance_3 = get_distance(Vector2d<float>(x, y), pos_3);
-  auto distance_4 = get_distance(Vector2d<float>(x, y), pos_4);
-
-  float inv1 = 1.0 / (distance_1 + 1e-6);
-  float inv2 = 1.0 / (distance_2 + 1e-6);
-  float inv3 = 1.0 / (distance_3 + 1e-6);
-  float inv4 = 1.0 / (distance_4 + 1e-6);
-
-  float sum_inv = inv1 + inv2 + inv3 + inv4;
-
-  float w1 = inv1 / sum_inv;
-  float w2 = inv2 / sum_inv;
-  float w3 = inv3 / sum_inv;
-  float w4 = inv4 / sum_inv;
-
-  if (is_valid_fluid(indices_1.get_x(), indices_1.get_y())) {
-    avg_smoke += w1 * this->d_smoke[indx(indices_1.get_x(), indices_1.get_y())];
-  }
-  if (is_valid_fluid(indices_2.get_x(), indices_2.get_y())) {
-    avg_smoke += w2 * this->d_smoke[indx(indices_2.get_x(), indices_2.get_y())];
-  }
-  if (is_valid_fluid(indices_3.get_x(), indices_3.get_y())) {
-    avg_smoke += w3 * this->d_smoke[indx(indices_3.get_x(), indices_3.get_y())];
-  }
-  if (is_valid_fluid(indices_4.get_x(), indices_4.get_y())) {
-    avg_smoke += w4 * this->d_smoke[indx(indices_4.get_x(), indices_4.get_y())];
-  }
-
-  return avg_smoke;
+  return w_00 * smoke_00 + w_10 * smoke_10 + w_01 * smoke_01 + w_11 * smoke_11;
 }
 
 // ? review this

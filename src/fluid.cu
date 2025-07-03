@@ -1,13 +1,9 @@
 #include <omp.h>
 #include <cmath>
-#include <cstdint>
 #include <cstdlib>
-#include <iostream>
 
 #include <thrust/device_ptr.h>
 #include <thrust/reduce.h>
-
-#include "SDL_rect.h"
 
 #include "config_parser.hpp"
 #include "fluid.cuh"
@@ -418,126 +414,67 @@ __device__ Vector2d<float> Fluid::get_horizontal_edge_velocity(int i,
 }
 
 __device__ float Fluid::get_general_velocity_y(float x, float y) const {
-  int i = x / this->cell_size;
-  int j = y / this->cell_size;
+  x /= this->cell_size;
+  y /= this->cell_size;
 
-  if (not this->is_valid_fluid(i, j)) {
-    return 0;
-  }
+  int i_1 = roundf(x);
+  int i_0 = i_1 - 1;
+  int j_0 = y;
+  int j_1 = y + 1;
 
-  float in_x = x - i * this->cell_size;
-  float in_y = y - j * this->cell_size;
+  i_1 = clamp(i_1, 0, this->width - 1);
+  i_0 = clamp(i_0, 0, this->width - 1);
+  j_0 = clamp(j_0, 0, this->height - 1);
+  j_1 = clamp(j_1, 0, this->height - 1);
 
-  float avg_v = 0;
+  float wx_0 = i_1 + 0.5 - x;
+  float wx_1 = x - (i_0 + 0.5);
+  float wy_0 = j_1 - y;
+  float wy_1 = y - j_0;
 
-  // take average with the left cell
-  if (in_x < this->cell_size / 2.0) {
-    float d_x = this->cell_size / 2.0 - in_x;
-    float w_x = 1 - d_x / this->cell_size;
-    float w_y = 1 - in_y / this->cell_size;
+  float w_00 = wx_0 * wy_0;
+  float w_10 = wx_1 * wy_0;
+  float w_01 = wx_0 * wy_1;
+  float w_11 = wx_1 * wy_1;
 
-    if (this->is_valid_fluid(i, j)) {
-      avg_v += w_y * w_x * this->d_vel_y[indx(i, j)];
-    }
+  float vel_00 = is_valid_fluid(i_0, j_0) ? this->d_vel_y[indx(i_0, j_0)] : 0;
+  float vel_10 = is_valid_fluid(i_1, j_0) ? this->d_vel_y[indx(i_1, j_0)] : 0;
+  float vel_01 = is_valid_fluid(i_0, j_1) ? this->d_vel_y[indx(i_0, j_1)] : 0;
+  float vel_11 = is_valid_fluid(i_1, j_1) ? this->d_vel_y[indx(i_1, j_1)] : 0;
 
-    if (this->is_valid_fluid(i - 1, j)) {
-      avg_v += w_y * (1 - w_x) * this->d_vel_y[indx(i - 1, j)];
-    }
-
-    if (this->is_valid_fluid(i - 1, j + 1)) {
-      avg_v += (1 - w_y) * (1 - w_x) * this->d_vel_y[indx(i - 1, j + 1)];
-    }
-
-    if (this->is_valid_fluid(i, j + 1)) {
-      avg_v += (1 - w_y) * w_x * this->d_vel_y[indx(i, j + 1)];
-    }
-  }
-  // take average with the right cell
-  else {
-    float d_x = in_x - this->cell_size / 2.0;
-    float w_x = 1 - d_x / this->cell_size;
-    float w_y = 1 - in_y / this->cell_size;
-
-    if (this->is_valid_fluid(i, j)) {
-      avg_v += w_y * w_x * this->d_vel_y[indx(i, j)];
-    }
-
-    if (this->is_valid_fluid(i, j + 1)) {
-      avg_v += (1 - w_y) * w_x * this->d_vel_y[indx(i, j + 1)];
-    }
-
-    if (this->is_valid_fluid(i + 1, j + 1)) {
-      avg_v += (1 - w_y) * (1 - w_x) * this->d_vel_y[indx(i + 1, j + 1)];
-    }
-
-    if (this->is_valid_fluid(i + 1, j)) {
-      avg_v += w_y * (1 - w_x) * this->d_vel_y[indx(i + 1, j)];
-    }
-  }
-
-  return avg_v;
+  return w_00 * vel_00 + w_10 * vel_10 + w_01 * vel_01 + w_11 * vel_11;
 }
 
 __device__ float Fluid::get_general_velocity_x(float x, float y) const {
-  int i = x / this->cell_size;
-  int j = y / this->cell_size;
+  x /= this->cell_size;
+  y /= this->cell_size;
 
-  if (not this->is_valid_fluid(i, j)) {
-    return 0;
-  }
+  int i_0 = x;
+  int i_1 = i_0 + 1;
+  int j_1 = roundf(y);
+  int j_0 = j_1 - 1;
 
-  float in_x = x - i * this->cell_size;
-  float in_y = y - j * this->cell_size;
+  i_1 = clamp(i_1, 0, this->width - 1);
+  i_0 = clamp(i_0, 0, this->width - 1);
+  j_0 = clamp(j_0, 0, this->height - 1);
+  j_1 = clamp(j_1, 0, this->height - 1);
 
-  float avg_u = 0;
+  float wy_0 = j_1 + 0.5 - y;
+  float wy_1 = y - (j_0 + 0.5);
+  float wx_0 = i_1 - x;
+  float wx_1 = x - i_0;
 
-  // take average with the bottom cell
-  if (in_y <= this->cell_size / 2.0) {
-    float d_y = this->cell_size / 2.0 - in_y;
-    float w_x = 1 - in_x / this->cell_size;
-    float w_y = 1 - d_y / this->cell_size;
+  float w_00 = wx_0 * wy_0;
+  float w_10 = wx_1 * wy_0;
+  float w_01 = wx_0 * wy_1;
+  float w_11 = wx_1 * wy_1;
 
-    if (this->is_valid_fluid(i, j)) {
-      avg_u += w_y * w_x * this->d_vel_x[indx(i, j)];
-    }
+  float vel_00 = is_valid_fluid(i_0, j_0) ? this->d_vel_x[indx(i_0, j_0)] : 0;
+  float vel_10 = is_valid_fluid(i_1, j_0) ? this->d_vel_x[indx(i_1, j_0)] : 0;
+  float vel_01 = is_valid_fluid(i_0, j_1) ? this->d_vel_x[indx(i_0, j_1)] : 0;
+  float vel_11 = is_valid_fluid(i_1, j_1) ? this->d_vel_x[indx(i_1, j_1)] : 0;
 
-    if (this->is_valid_fluid(i + 1, j)) {
-      avg_u += w_y * (1 - w_x) * this->d_vel_x[indx(i + 1, j)];
-    }
-
-    if (this->is_valid_fluid(i, j - 1)) {
-      avg_u += (1 - w_y) * w_x * this->d_vel_x[indx(i, j - 1)];
-    }
-
-    if (this->is_valid_fluid(i + 1, j - 1)) {
-      avg_u += (1 - w_y) * (1 - w_x) * this->d_vel_x[indx(i + 1, j - 1)];
-    }
-  }
-
-  // take average with the top cell
-  else {
-    float d_y = in_y - this->cell_size / 2.0;
-    float w_x = 1 - in_x / this->cell_size;
-    float w_y = 1 - d_y / this->cell_size;
-
-    if (this->is_valid_fluid(i, j)) {
-      avg_u += w_y * w_x * this->d_vel_x[indx(i, j)];
-    }
-
-    if (this->is_valid_fluid(i, j + 1)) {
-      avg_u += (1 - w_y) * w_x * this->d_vel_x[indx(i, j + 1)];
-    }
-
-    if (this->is_valid_fluid(i + 1, j)) {
-      avg_u += w_y * (1 - w_x) * this->d_vel_x[indx(i + 1, j)];
-    }
-
-    if (this->is_valid_fluid(i + 1, j + 1)) {
-      avg_u += (1 - w_y) * (1 - w_x) * this->d_vel_x[indx(i + 1, j + 1)];
-    }
-  }
-
-  return avg_u;
+  return w_00 * vel_00 + w_10 * vel_10 + w_01 * vel_01 + w_11 * vel_11;
 }
 
 __device__ Vector2d<float> Fluid::get_general_velocity(float x, float y) const {
@@ -644,21 +581,23 @@ void Fluid::apply_velocity_advection(float d_t) {
 }
 
 __device__ float Fluid::interpolate_smoke(float x, float y) const {
-  float normalized_x = x / this->cell_size;
-  float normalized_y = y / this->cell_size;
+  x /= this->cell_size;
+  y /= this->cell_size;
 
-  int i = roundf(normalized_x) - 1;
-  int j = roundf(normalized_y) - 1;
+  int i_1 = roundf(x);
+  int j_1 = roundf(y);
+  int i_0 = i_1 - 1;
+  int j_0 = j_1 - 1;
 
-  float smoke_00 = this->d_smoke[indx(i, j)];
-  float smoke_10 = this->d_smoke[indx(i + 1, j)];
-  float smoke_01 = this->d_smoke[indx(i, j + 1)];
-  float smoke_11 = this->d_smoke[indx(i + 1, j + 1)];
+  float smoke_00 = is_valid_fluid(i_0, j_0) ? this->d_smoke[indx(i_0, j_0)] : 0;
+  float smoke_10 = is_valid_fluid(i_1, j_0) ? this->d_smoke[indx(i_1, j_0)] : 0;
+  float smoke_01 = is_valid_fluid(i_0, j_1) ? this->d_smoke[indx(i_0, j_1)] : 0;
+  float smoke_11 = is_valid_fluid(i_1, j_1) ? this->d_smoke[indx(i_1, j_1)] : 0;
 
-  float wx_0 = i + 1.5 - normalized_x;
-  float wy_0 = j + 1.5 - normalized_y;
-  float wx_1 = normalized_x - 0.5 - i;
-  float wy_1 = normalized_y - 0.5 - j;
+  float wx_0 = i_1 + 0.5 - x;
+  float wy_0 = j_1 + 0.5 - y;
+  float wx_1 = x - (i_0 + 0.5);
+  float wy_1 = y - (j_0 + 0.5);
 
   float w_00 = wx_0 * wy_0;
   float w_01 = wx_0 * wy_1;

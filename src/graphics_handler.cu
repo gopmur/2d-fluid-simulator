@@ -1,4 +1,4 @@
-
+#include "helper.cuh"
 #include "graphics_handler.cuh"
 
 __device__ __host__ int GraphicsHandler::indx(int x, int y) {

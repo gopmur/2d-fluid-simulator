@@ -45,7 +45,3 @@ __device__ __host__ void hsv_to_rgb(float h,
 __device__ __host__ int map_rgba(int r, int g, int b, int a) {
   return r << 24 | g << 16 | b << 8 | a;
 }
-
-__host__ __device__ float clamp(float x, float lower, float upper) {
-  return (x < lower) ? lower : (x > upper) ? upper : x;
-}

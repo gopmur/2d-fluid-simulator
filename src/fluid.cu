@@ -179,7 +179,7 @@ __device__ void Fluid::apply_diffusion_at(int i, int j, float d_t) {
 }
 
 void Fluid::apply_diffusion(float d_t) {
-  for (int _; _ < this->n; _++) {
+  for (int _ = 0; _ < this->n; _++) {
     apply_diffusion_kernel<<<this->kernel_grid_dim, this->kernel_block_dim>>>(
         d_this, d_t);
   }

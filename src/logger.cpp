@@ -1,5 +1,3 @@
-#include <cstdlib>
-
 #include "config.hpp"
 #include "logger.hpp"
 

@@ -13,6 +13,7 @@
     "Malloc",
     "Memcpy",
     "MOUSEMOTION",
+    "MSVC",
     "nlohmann",
     "nullopt",
     "nvcc",

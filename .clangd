@@ -1,0 +1,7 @@
+CompileFlags:
+  CompilationDatabase: build
+  Remove: [-f*, 
+           --use_fast_math,
+           --ptxas-options=*, 
+           -rdc=*, 
+           --generate-code=*]

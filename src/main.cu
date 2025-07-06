@@ -2,11 +2,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <fstream>
 #include <optional>
 
 #include "SDL_events.h"
-#include "json.hpp"
 
 #include "config_parser.hpp"
 #include "fluid.cuh"

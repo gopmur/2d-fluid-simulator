@@ -1,18 +1,8 @@
 #pragma once
 
-#include <omp.h>
-#include <cmath>
-#include <cstdint>
-#include <format>
-
-#include "SDL.h"
-#include "SDL_rect.h"
 #include "SDL_render.h"
 
-#include "config.hpp"
 #include "fluid.cuh"
-#include "helper.cuh"
-#include "logger.hpp"
 
 struct ArrowData {
   int start_x;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cmath>
+#include <math.h>
 
 #define FPS_AVG_SIZE 10
 #define ARROW_HEAD_ANGLE M_PI / 8

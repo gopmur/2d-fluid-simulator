@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL_rect.h"
-
 #include "config_parser.hpp"
 #include "helper.cuh"
 

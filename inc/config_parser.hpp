@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "json.hpp"
+#include "json.hpp" // IWYU pragma: keep
 
 using json = nlohmann::json;
 

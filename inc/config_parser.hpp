@@ -13,17 +13,12 @@ struct ColorConfig {
   int a;
 };
 
-struct OpenMPConfig {
-  int thread_count;
-};
-
 struct CudaConfig {
   int block_size_x;
   int block_size_y;
 };
 
 struct ThreadConfig {
-  OpenMPConfig openMP;
   CudaConfig cuda;
 };
 

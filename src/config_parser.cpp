@@ -1,6 +1,5 @@
 #include <fstream>
 #include <iostream>
-#include <omp.h>
 
 #include "json.hpp"
 
@@ -24,9 +23,6 @@ Config ConfigParser::parse() const {
   config = {
       .thread =
           {
-              .openMP = {.thread_count = ConfigParser::get_or(
-                             config_json, "thread.openMP.thread_count",
-                             omp_get_thread_num() / 2)},
               .cuda = {.block_size_x = ConfigParser::get_or(
                            config_json, "thread.cuda.block_size_x", 64),
                        .block_size_y = ConfigParser::get_or(
@@ -138,20 +134,15 @@ Config ConfigParser::parse() const {
                           config_json, "visual.arrows.distance", 20),
                       .length_multiplier = ConfigParser::get_or(
                           config_json, "visual.arrows.length_multiplier", 0.1f),
-                      .disable_threshold =
-                          ConfigParser::get_or(
-                              config_json,
-                              "visual.arrows.disable_threshold", 0.0f),
-                      .head_length =
-                          ConfigParser::get_or(config_json,
-                                               "visual.arrows.head_length", 5),
+                      .disable_threshold = ConfigParser::get_or(
+                          config_json, "visual.arrows.disable_threshold", 0.0f),
+                      .head_length = ConfigParser::get_or(
+                          config_json, "visual.arrows.head_length", 5),
                   },
               .path_line =
                   {
-                      .enable =
-                          ConfigParser::get_or(config_json,
-                                               "visual.path_line.enable",
-                                               false),
+                      .enable = ConfigParser::get_or(
+                          config_json, "visual.path_line.enable", false),
                       .length =
                           ConfigParser::get_or(config_json,
                                                "visual.path_line.length", 20),
@@ -162,13 +153,13 @@ Config ConfigParser::parse() const {
                                       config_json,
                                       "visual.path_line.color.r", 0),
                               .g =
-                                  ConfigParser::
-                                      get_or(config_json,
-                                             "visual.path_line.color.g", 0),
+                                  ConfigParser::get_or(
+                                      config_json,
+                                      "visual.path_line.color.g", 0),
                               .b =
-                                  ConfigParser::
-                                      get_or(config_json,
-                                             "visual.path_line.color.b", 0),
+                                  ConfigParser::get_or(
+                                      config_json,
+                                      "visual.path_line.color.b", 0),
                               .a =
                                   ConfigParser::
                                       get_or(config_json,

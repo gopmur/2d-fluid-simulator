@@ -11,17 +11,17 @@ set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS_RELEASE "/O2 /openmp")
-  set(CMAKE_CUDA_FLAGS_RELEASE "-O3 -Xcompiler=/openmp --use_fast_math --ptxas-options=-O3 -rdc=true")
+  set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+  set(CMAKE_CUDA_FLAGS_RELEASE "-O3 --use_fast_math --ptxas-options=-O3 -rdc=true")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /openmp /Od /Zi")
-  set(CMAKE_CUDA_FLAGS_DEBUG "-O0 -Xcompiler=/openmp -G -rdc=true")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Od /Zi")
+  set(CMAKE_CUDA_FLAGS_DEBUG "-O0 -G -rdc=true")
 else()
-  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -fopenmp")
-  set(CMAKE_CUDA_FLAGS_RELEASE "-O3 -Xcompiler=-fopenmp --use_fast_math --ptxas-options=-O3 -rdc=true")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native ")
+  set(CMAKE_CUDA_FLAGS_RELEASE "-O3 --use_fast_math --ptxas-options=-O3 -rdc=true")
 
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fopenmp")
-  set(CMAKE_CUDA_FLAGS_DEBUG "-O0 -Xcompiler=-fopenmp -G -rdc=true")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ")
+  set(CMAKE_CUDA_FLAGS_DEBUG "-O0 -G -rdc=true")
 endif()
 
 # store source files

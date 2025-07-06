@@ -1,5 +1,8 @@
+#include "SDL.h"
+
 #include "helper.cuh"
 #include "graphics_handler.cuh"
+#include "logger.hpp"
 
 __device__ __host__ int GraphicsHandler::indx(int x, int y) {
   return y * this->width + x;

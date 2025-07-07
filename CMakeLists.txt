@@ -1,4 +1,12 @@
 cmake_minimum_required(VERSION 4.0)
+
+if (EXISTS "${CMAKE_SOURCE_DIR}/cmake/compiler_settings.cmake")
+  include("${CMAKE_SOURCE_DIR}/cmake/compiler_settings.cmake")
+else()
+  include("${CMAKE_SOURCE_DIR}/cmake/compiler_settings.default.cmake")
+  message(WARNING "No compiler settings file found, using default settings.")
+endif()
+
 project(OpenSayal CXX CUDA)
 
 # set c++ version

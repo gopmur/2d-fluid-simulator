@@ -6,3 +6,4 @@ build
 CMakeFiles
 CMakeCache.txt
 OpenSayal.conf.json
+cmake/compiler_settings.cmake

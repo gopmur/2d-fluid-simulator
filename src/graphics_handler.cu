@@ -1,7 +1,9 @@
 #include "SDL.h"
+#include "SDL_ttf.h"
 
-#include "helper.cuh"
+#include <cstdlib>
 #include "graphics_handler.cuh"
+#include "helper.cuh"
 #include "logger.hpp"
 
 __device__ __host__ int GraphicsHandler::indx(int x, int y) {
@@ -59,6 +61,15 @@ void GraphicsHandler::init_sdl() {
     auto sdl_error_message = SDL_GetError();
     Logger::error(
         std::format("video initialization failed: ", sdl_error_message));
+    exit(EXIT_FAILURE);
+  }
+
+  sdl_status = TTF_Init();
+  if (sdl_status < 0) {
+    auto sdl_error_message = TTF_GetError();
+    Logger::error(
+        std::format("ttf initialization failed: ", sdl_error_message));
+    this->cleanup();
     exit(EXIT_FAILURE);
   }
 
@@ -165,6 +176,7 @@ void GraphicsHandler::cleanup() {
   if (this->format != nullptr) {
     SDL_FreeFormat(format);
   }
+  TTF_Quit();
   SDL_Quit();
 }
 

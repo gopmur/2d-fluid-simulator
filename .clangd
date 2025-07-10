@@ -4,4 +4,5 @@ CompileFlags:
            --use_fast_math,
            --ptxas-options=*, 
            -rdc=*, 
-           --generate-code=*]
+           --generate-code=*,
+           -Xcompiler=-fPIE]

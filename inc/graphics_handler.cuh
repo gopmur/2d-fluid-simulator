@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SDL_render.h"
+#include "SDL_ttf.h"
 
 #include "fluid.cuh"
 
@@ -22,6 +23,7 @@ class GraphicsHandler {
   SDL_Window* window;
   SDL_Texture* fluid_texture;
   SDL_PixelFormat* format;
+  TTF_Font* font;
 
   int* traces_x;
   int* d_traces_x;

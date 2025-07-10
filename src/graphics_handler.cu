@@ -2,6 +2,7 @@
 #include "SDL_ttf.h"
 
 #include <cstdlib>
+#include "config.hpp"
 #include "graphics_handler.cuh"
 #include "helper.cuh"
 #include "logger.hpp"
@@ -52,6 +53,7 @@ void GraphicsHandler::init_sdl() {
   this->renderer = nullptr;
   this->fluid_texture = nullptr;
   this->format = nullptr;
+  this->font = nullptr;
 
   int window_height = cell_size * height;
   int window_width = cell_size * width;
@@ -69,6 +71,15 @@ void GraphicsHandler::init_sdl() {
     auto sdl_error_message = TTF_GetError();
     Logger::error(
         std::format("ttf initialization failed: ", sdl_error_message));
+    this->cleanup();
+    exit(EXIT_FAILURE);
+  }
+
+  this->font = TTF_OpenFont(FONT_PATH, FONT_SIZE);
+  if (this->font == nullptr) {
+    auto sdl_error_message = TTF_GetError();
+    Logger::error(
+        std::format("font didn't load correctly: ", sdl_error_message));
     this->cleanup();
     exit(EXIT_FAILURE);
   }
@@ -175,6 +186,9 @@ void GraphicsHandler::cleanup() {
   }
   if (this->format != nullptr) {
     SDL_FreeFormat(format);
+  }
+  if (this->font != nullptr) {
+    TTF_CloseFont(this->font);
   }
   TTF_Quit();
   SDL_Quit();

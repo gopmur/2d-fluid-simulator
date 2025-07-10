@@ -10,6 +10,7 @@
     "CUDA",
     "DCMAKE",
     "fopenmp",
+    "Kode",
     "Malloc",
     "Memcpy",
     "MOUSEMOTION",

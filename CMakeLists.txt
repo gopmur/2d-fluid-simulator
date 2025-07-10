@@ -32,7 +32,7 @@ else()
   set(CMAKE_CUDA_FLAGS_DEBUG "-O0 -G -rdc=true")
 endif()
 
-# store source files
+# store source files/include
 file(GLOB_RECURSE PROJECT_SOURCE_FILES
   "${PROJECT_SOURCE_DIR}/src/*.cpp"
   "${PROJECT_SOURCE_DIR}/src/*.cu"
@@ -43,6 +43,7 @@ set(PROJECT_INCLUDE_DIRECTORIES
   "inc"
   "lib/sdl/include"
   "lib/json/include/nlohmann"
+  "lib/sdl_ttf"
 )
 
 # add source files
@@ -58,14 +59,17 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 add_subdirectory("lib/sdl")
 add_subdirectory("lib/json")
+add_subdirectory("lib/sdl_ttf")
 
 target_link_directories(${PROJECT_NAME} PRIVATE
   "lib/sdl"
   "lib/json"
+  "lib/sdl_ttf"
 )
 
 target_link_libraries(${PROJECT_NAME}
   SDL2
   SDL2main
+  SDL2_ttf
   nlohmann_json
 )

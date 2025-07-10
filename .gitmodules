@@ -4,3 +4,6 @@
 [submodule "lib/json"]
 	path = lib/json
 	url = https://github.com/nlohmann/json.git
+[submodule "lib/sdl_ttf"]
+	path = lib/sdl_ttf
+	url = https://github.com/libsdl-org/SDL_ttf.git
